@@ -88,7 +88,7 @@ def draw_boxes(image_, boxes, labels): ## channel order: RGB / BGR
         cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (0,255,0), conf.YOLO_DRAW_LINE_W)
         if conf.YOLO_SHOW_CONF:
             cv2.putText(image,
-                        labels[box.get_label()] + ' ' + str(box.get_score()),
+                        str(labels[box.get_label()]) + ' ' + str(box.get_score()),
                         (xmin, ymin - 13),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1e-3 * image.shape[0],
