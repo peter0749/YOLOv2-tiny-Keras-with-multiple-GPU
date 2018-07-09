@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from utils import normalize, multi_gpu_ckpt
 from generators import YOLO_BatchGenerator
 
-SCALES = [conf.YOLO_DIM-64, conf.YOLO_DIM, conf.YOLO_DIM+64] # different scales
+SCALES = [conf.YOLO_DIM+64, conf.YOLO_DIM-64, conf.YOLO_DIM] # different scales
 LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
 

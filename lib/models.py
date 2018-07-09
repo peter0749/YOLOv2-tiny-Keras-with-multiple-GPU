@@ -13,13 +13,13 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     def space_to_depth_x2(x):
         return tf.space_to_depth(x, block_size=2)
     from keras.models import Sequential, Model
-    from keras.layers import Reshape, Activation, Conv2D, Input, MaxPooling2D, Flatten, Dense, Lambda, BatchNormalization
+    from keras.layers import Reshape, Activation, Conv2D, Input, MaxPooling2D, Flatten, Dense, Lambda
     from keras.layers.advanced_activations import LeakyReLU
     from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
     from keras.layers.merge import concatenate
     from keras.utils.training_utils import multi_gpu_model
     import keras.backend as K
-    from keras.optimizers import Adam
+    from weightnorm import AdamWithWeightnorm as Adam
 
     YOLO_GRID = conf.YOLO_GRID
 
@@ -29,48 +29,40 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     # Tiny tiny tiny YOLOv2:
     # Layer 1
     x = Conv2D(16, (3,3), strides=(1,1), padding='same', name='conv_1', kernel_initializer='he_normal')(input_image)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //2
 
     # Layer 2
     x = Conv2D(32, (3,3), strides=(1,1), padding='same', name='conv_2', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //4
 
     # Layer 3
     x = Conv2D(64, (3,3), strides=(1,1), padding='same', name='conv_3', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //8
 
     # Layer 4
     x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_4', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //16
 
     # Layer 5
     x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_5', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //32
 
     # Layer 6
     x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_6', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(x) # //32
 
     # Layer 7
     x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_7', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 8
     x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_8', kernel_initializer='he_normal')(x)
-    x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 9
@@ -98,7 +90,7 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
 ### U-Net:
 def get_U_Net_model(img_size=conf.U_NET_DIM, gpus=1, load_weights=None, verbose=False):
     from keras.models import Model, load_model
-    from keras.layers import Input, Add, Activation, BatchNormalization
+    from keras.layers import Input, Add, Activation
     from keras.layers.core import Lambda
     from keras.layers.convolutional import Conv2D, Conv2DTranspose
     from keras.layers.pooling import MaxPooling2D
@@ -106,7 +98,7 @@ def get_U_Net_model(img_size=conf.U_NET_DIM, gpus=1, load_weights=None, verbose=
     from keras.callbacks import EarlyStopping, ModelCheckpoint
     from keras.utils.training_utils import multi_gpu_model
     from keras import backend as K
-    from keras.optimizers import Adam
+    from weightnorm import AdamWithWeightnorm as Adam
     import tensorflow as tf
 
     IMG_WIDTH = img_size
@@ -146,7 +138,6 @@ def get_U_Net_model(img_size=conf.U_NET_DIM, gpus=1, load_weights=None, verbose=
             t1 = inputs
 
         out = Add()([t1, cs]) # t1 + c2
-        out = BatchNormalization()(out)
         out = Activation('elu') (out)
         return out
     def pool():
