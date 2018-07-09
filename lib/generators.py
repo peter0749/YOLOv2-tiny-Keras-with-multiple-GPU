@@ -13,14 +13,12 @@ from reader import dataset_filepath
 class YOLO_BatchGenerator(Sequence):
     def __init__(self, images,
                        config,
-                       shuffle=True,
                        jitter=True,
                        norm=None):
 
         self.images = images
         self.config = config
 
-        self.shuffle = shuffle
         self.jitter  = jitter
         self.norm    = norm
 
@@ -59,8 +57,6 @@ class YOLO_BatchGenerator(Sequence):
             ],
             random_order=True
         )
-
-        if shuffle: np.random.shuffle(self.images)
 
     def __len__(self):
         return int(np.ceil(float(len(self.images))/self.config['BATCH_SIZE']))
@@ -132,9 +128,6 @@ class YOLO_BatchGenerator(Sequence):
 
         return [x_batch, b_batch], y_batch
 
-    def on_epoch_end(self):
-        if self.shuffle: np.random.shuffle(self.images)
-
     def aug_image(self, train_instance, jitter):
         image_name = train_instance['image']
         image = cv2.imread(image_name, cv2.IMREAD_COLOR)[...,:3]
@@ -195,7 +188,6 @@ class U_NET_BatchGenerator(Sequence):
     def __init__(self, images,
                        coco,
                        config,
-                       shuffle=True,
                        jitter=True,
                        norm=None):
         self.coco = coco
@@ -203,7 +195,6 @@ class U_NET_BatchGenerator(Sequence):
         self.images = [] # pairs of (img, mask)
         self.config = config
 
-        self.shuffle = shuffle
         self.jitter  = jitter
         self.norm    = norm
 
@@ -237,8 +228,6 @@ class U_NET_BatchGenerator(Sequence):
                 mask['height'] = img['height']
                 self.images.append(mask) # list of: {'image':filepath, 'mask':filepath, width, height, xmax, ymax, ...}
 
-        if self.shuffle: np.random.shuffle(self.images)
-
     def __len__(self):
         return int(np.ceil(float(len(self.images))/self.config['BATCH_SIZE']))
 
@@ -261,9 +250,6 @@ class U_NET_BatchGenerator(Sequence):
             y_batch[instance_count,...,0] = lab
 
         return x_batch, y_batch
-
-    def on_epoch_end(self):
-        if self.shuffle: np.random.shuffle(self.images)
 
     def aug_image(self, train_instance, jitter):
         image_name = train_instance['image']

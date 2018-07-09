@@ -31,7 +31,7 @@ if not os.path.exists(conf.YOLO_CKPT):
 yolo_model, cpu_model = models.get_yolo_model(img_size=conf.YOLO_DIM, gpus=0, load_weights=LAST_CKPT_PATH, verbose=True)
 GEN_CONF = conf.yolo_generator_config
 GEN_CONF['BATCH_SIZE'] = 1
-valid_batch = YOLO_BatchGenerator(val_imgs, GEN_CONF, shuffle=False, jitter=False, norm=normalize)
+valid_batch = YOLO_BatchGenerator(val_imgs, GEN_CONF, jitter=False, norm=normalize)
 print('YOLO model loaded!')
 
 inputs = valid_batch.__getitem__(np.random.randint(len(valid_batch)))[0][0]

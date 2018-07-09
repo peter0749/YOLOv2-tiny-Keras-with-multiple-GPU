@@ -59,8 +59,8 @@ for EPOCH in range(0, conf.U_NET_EPOCHS, conf.U_NET_CH_DIM_EPOCHS):
 
     csv_logger = CSVLogger('u_net_training.log', append=True)
 
-    train_batch = U_NET_BatchGenerator(train_imgs, coco_train, U_NET_GENERATOR_CONF, shuffle=True, jitter=True, norm=normalize) # shuffle and aug
-    valid_batch = U_NET_BatchGenerator(val_imgs, coco_valid, U_NET_GENERATOR_CONF, shuffle=False, jitter=False, norm=normalize) # not shuffle and not aug
+    train_batch = U_NET_BatchGenerator(train_imgs, coco_train, U_NET_GENERATOR_CONF, jitter=True, norm=normalize)
+    valid_batch = U_NET_BatchGenerator(val_imgs, coco_valid, U_NET_GENERATOR_CONF, jitter=False, norm=normalize)
 
     end_epoch = min(conf.U_NET_EPOCHS, EPOCH+conf.U_NET_CH_DIM_EPOCHS)
 
@@ -74,6 +74,7 @@ for EPOCH in range(0, conf.U_NET_EPOCHS, conf.U_NET_CH_DIM_EPOCHS):
                         max_queue_size   = 3,
                         workers = conf.GENERATOR_WORKERS,
                         use_multiprocessing = True,
+                        shuffle = True,
                         initial_epoch = EPOCH
                         )
     K.clear_session()

@@ -59,8 +59,8 @@ for EPOCH in range(0, conf.YOLO_EPOCHS, conf.YOLO_CH_DIM_EPOCHS):
 
     csv_logger = CSVLogger('training.log', append=True)
 
-    train_batch = YOLO_BatchGenerator(train_imgs, YOLO_GENERATOR_CONF, shuffle=True, jitter=True, norm=normalize) # shuffle and aug
-    valid_batch = YOLO_BatchGenerator(val_imgs, YOLO_GENERATOR_CONF, shuffle=False, jitter=False, norm=normalize) # not shuffle and not aug
+    train_batch = YOLO_BatchGenerator(train_imgs, YOLO_GENERATOR_CONF, jitter=True, norm=normalize)
+    valid_batch = YOLO_BatchGenerator(val_imgs, YOLO_GENERATOR_CONF, jitter=False, norm=normalize)
 
     end_epoch = min(conf.YOLO_EPOCHS, EPOCH+conf.YOLO_CH_DIM_EPOCHS)
 
@@ -74,6 +74,7 @@ for EPOCH in range(0, conf.YOLO_EPOCHS, conf.YOLO_CH_DIM_EPOCHS):
                         max_queue_size   = 3,
                         workers = conf.GENERATOR_WORKERS,
                         use_multiprocessing = True,
+                        shuffle = True,
                         initial_epoch = EPOCH
                         )
     K.clear_session()
