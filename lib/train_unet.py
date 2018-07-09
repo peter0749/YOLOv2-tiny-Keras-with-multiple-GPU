@@ -16,8 +16,8 @@ from sklearn.model_selection import train_test_split
 from utils import normalize, multi_gpu_ckpt
 from generators import U_NET_BatchGenerator
 
-SCALES = [conf.U_NET_DIM-32, conf.U_NET_DIM, conf.U_NET_DIM+32] # different scales
-# SCALES = [conf.U_NET_DIM] # different scales
+# SCALES = [conf.U_NET_DIM-32, conf.U_NET_DIM, conf.U_NET_DIM+32] # different scales
+SCALES = [conf.U_NET_DIM] # different scales
 LAST_CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
 
