@@ -28,48 +28,48 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
 
     # Tiny tiny tiny YOLOv2:
     # Layer 1
-    x = Conv2D(16, (3,3), strides=(1,1), padding='same', name='conv_1', kernel_initializer='he_normal', use_bias=False)(input_image)
+    x = Conv2D(16, (3,3), strides=(1,1), padding='same', name='conv_1', kernel_initializer='he_normal')(input_image)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //2
 
     # Layer 2
-    x = Conv2D(32, (3,3), strides=(1,1), padding='same', name='conv_2', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(32, (3,3), strides=(1,1), padding='same', name='conv_2', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //4
 
     # Layer 3
-    x = Conv2D(64, (3,3), strides=(1,1), padding='same', name='conv_3', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(64, (3,3), strides=(1,1), padding='same', name='conv_3', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //8
 
     # Layer 4
-    x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_4', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_4', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //16
 
     # Layer 5
-    x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_5', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_5', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x) # //32
 
     # Layer 6
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_6', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_6', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(x) # //32
 
     # Layer 7
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_7', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_7', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 8
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_8', kernel_initializer='he_normal', use_bias=False)(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_8', kernel_initializer='he_normal')(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(alpha=0.1)(x)
 
