@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from utils import normalize, multi_gpu_ckpt
 from generators import YOLO_BatchGenerator
 
-SCALES = list(range(5*32, conf.YOLO_DIM+1, 64)) # different scales
+SCALES = [conf.YOLO_DIM-64, conf.YOLO_DIM, conf.YOLO_DIM+64] # different scales
 LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
 
@@ -33,7 +33,7 @@ scale_index = 0
 for EPOCH in range(0, conf.YOLO_EPOCHS, conf.YOLO_CH_DIM_EPOCHS):
     YOLO_GENERATOR_CONF = conf.yolo_generator_config
     img_size = SCALES[scale_index]
-    scale_index = (scale_index+1) % conf.YOLO_CH_DIM_EPOCHS
+    scale_index = (scale_index+1) % len(SCALES)
     YOLO_GENERATOR_CONF['IMAGE_H'] = YOLO_GENERATOR_CONF['IMAGE_W'] = img_size
     YOLO_GENERATOR_CONF['GRID_H'] = YOLO_GENERATOR_CONF['GRID_W'] = img_size // 32
 

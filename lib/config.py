@@ -19,16 +19,16 @@ U_NET_DIM = 96
 
 # YOLO step-by-step ref:
 # https://github.com/experiencor/basic-yolo-keras/blob/master/Yolo%20Step-by-Step.ipynb
-YOLO_DIM = 416 ## must be integer (odd number) * 32.
+YOLO_DIM = 224 ## must be integer (odd number) * 32.
 OBJECT_THRESHOLD = 0.3 # <- notice here
 NMS_THRESHOLD = 0.3 # less overlapping
 U_NET_THRESHOLD = 0.5
-ANCHORS = [0.53,0.79, 1.70,2.35, 2.87,6.43, 6.29,3.76, 8.99,9.71]
+ANCHORS = [0.25,0.39, 0.78,1.03, 1.15,2.72, 2.59,4.35, 2.86,1.59, 5.62,5.08]
 NO_OBJECT_SCALE  = 1.0
 OBJECT_SCALE     = 5.0
 COORD_SCALE      = 1.0
-WARM_UP_BATCHES  = 1000
-TRUE_BOX_BUFFER  = 50
+WARM_UP_BATCHES  = 500
+TRUE_BOX_BUFFER  = 100
 
 YOLO_DRAW_LINE_W = 1
 YOLO_SHOW_CONF = True
@@ -45,7 +45,7 @@ YOLO_EPOCHS=120
 U_NET_EPOCHS=120
 
 YOLO_CH_DIM_EPOCHS=3
-U_NET_CH_DIM_EPOCHS=2
+U_NET_CH_DIM_EPOCHS=3
 
 YOLO_CKPT = '../yolo_weights'
 YOLO_PRETRAINED = None # '../yolov2-voc.weights'

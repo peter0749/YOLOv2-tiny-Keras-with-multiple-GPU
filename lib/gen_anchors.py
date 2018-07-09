@@ -11,7 +11,7 @@ argparser.add_argument(
     '-a',
     '--anchors',
     type=int,
-    default=5,
+    default=6,
     help='number of anchors to use')
 
 argparser.add_argument(
