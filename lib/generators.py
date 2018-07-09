@@ -39,17 +39,18 @@ class YOLO_BatchGenerator(Sequence):
                 iaa.SomeOf((0, 5),
                     [
                         iaa.OneOf([
-                            iaa.GaussianBlur((0, 3.0)), # blur images with a sigma between 0 and 3.0
-                            iaa.AverageBlur(k=(2, 7)), # blur image using local means with kernel sizes between 2 and 7
-                            iaa.MedianBlur(k=(3, 11)), # blur image using local medians with kernel sizes between 2 and 7
+                            iaa.GaussianBlur((0, 1.0)), # blur images with a sigma between 0 and 3.0
+                            iaa.AverageBlur(k=(3, 5)), # blur image using local means with kernel sizes between 2 and 7
+                            iaa.MedianBlur(k=(3, 5)), # blur image using local medians with kernel sizes between 2 and 7
                         ]),
                         iaa.Sharpen(alpha=(0, 1.0), lightness=(0.75, 1.5)), # sharpen images
                         iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.05*255), per_channel=0.5), # add gaussian noise to images
                         iaa.OneOf([
                             iaa.Dropout((0.01, 0.1), per_channel=0.5), # randomly remove up to 10% of the pixels
+                            iaa.CoarseDropout((0.03, 0.15), size_percent=(0.02, 0.05), per_channel=0.2)
                         ]),
                         iaa.Add((-10, 10), per_channel=0.5), # change brightness of images (by -10 to 10 of original value)
-                        iaa.Multiply((0.5, 1.5), per_channel=0.5), # change brightness of images (50-150% of original value)
+                        iaa.Multiply((0.8, 1.2), per_channel=0.5), # change brightness of images (50-150% of original value)
                         iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5), # improve or worsen the contrast
                     ],
                     random_order=True
@@ -142,7 +143,7 @@ class YOLO_BatchGenerator(Sequence):
         if jitter:
             ### scale the image
             scale = np.random.uniform() / 10. + 1.
-            image = cv2.resize(image, (0,0), fx = scale, fy = scale)
+            image = cv2.resize(image, (0,0), fx = scale, fy = scale, interpolation=cv2.INTER_LINEAR)
 
             ### translate the image
             max_offx = (scale-1.) * w
@@ -156,10 +157,11 @@ class YOLO_BatchGenerator(Sequence):
             flip = np.random.binomial(1, .5)
             if flip > 0.5: image = cv2.flip(image, 1)
 
-            image = self.aug_pipe.augment_image(image)
+            if np.random.binomial(1, .4):
+                image = self.aug_pipe.augment_image(image)
 
         # resize the image to standard size
-        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W']))
+        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_AREA)
 
         # fix object's position and size
         for obj in all_objs:
@@ -207,11 +209,10 @@ class U_NET_BatchGenerator(Sequence):
         # _per channel_.
         self.aug_pipe = iaa.Sequential(
             [
-                iaa.Fliplr(0.5),
-                iaa.Flipud(0.5),
+                iaa.Fliplr(0.3),
                 sometimes(iaa.Affine(
-                    rotate=(-45, 45), # rotate by -45 to +45 degrees
-                    shear=(-16, 16), # shear by -16 to +16 degrees
+                    rotate=(-15, 15), # rotate by -45 to +45 degrees
+                    shear=(-3, 3), # shear by -16 to +16 degrees
                     order=[0, 1], # use nearest neighbour or bilinear interpolation (fast)
                     cval=0, # if mode is constant, use a cval between 0 and 255
                     mode='constant' # use any of scikit-image's warping modes (see 2nd image from the top for examples)
@@ -280,14 +281,14 @@ class U_NET_BatchGenerator(Sequence):
 
         h, w, c = image.shape
 
-        if jitter:
+        if jitter and np.random.binomial(1, 0.4):
             seq_det = self.aug_pipe.to_deterministic()
             image = seq_det.augment_image(image)
             mask  = seq_det.augment_image( mask)
 
         # resize the image to standard size
-        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W'])) # shape: (IMAGE_H, IMAGE_W, 3)
-        mask  = (cv2.resize(np.squeeze(mask) , (self.config['IMAGE_H'], self.config['IMAGE_W']))>.5).astype(np.float32) # shape: (IMAGE_H, IMAGE_W)
+        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_AREA) # shape: (IMAGE_H, IMAGE_W, 3)
+        mask  = (cv2.resize(np.squeeze(mask) , (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_LINEAR)>.5).astype(np.float32) # shape: (IMAGE_H, IMAGE_W)
 
         return image, mask
 ### end U-Net generator ###
