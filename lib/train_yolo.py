@@ -29,9 +29,11 @@ if not os.path.exists(conf.YOLO_CKPT):
 
 print('Begin to train YOLO model')
 
+scale_index = 0
 for EPOCH in range(0, conf.YOLO_EPOCHS, conf.YOLO_CH_DIM_EPOCHS):
     YOLO_GENERATOR_CONF = conf.yolo_generator_config
-    img_size = np.random.choice(SCALES)
+    img_size = SCALES[scale_index]
+    scale_index = (scale_index+1) % conf.YOLO_CH_DIM_EPOCHS
     YOLO_GENERATOR_CONF['IMAGE_H'] = YOLO_GENERATOR_CONF['IMAGE_W'] = img_size
     YOLO_GENERATOR_CONF['GRID_H'] = YOLO_GENERATOR_CONF['GRID_W'] = img_size // 32
 

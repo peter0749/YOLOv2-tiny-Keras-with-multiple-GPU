@@ -36,7 +36,7 @@ YOLO_SHOW_CONF = False
 YOLO_USE_MULTI_GPU=0
 U_NET_USE_MULTI_GPU=0
 
-YOLO_BATCH_SIZE=16  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
+YOLO_BATCH_SIZE=10  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
 U_NET_BATCH_SIZE=16
 
 GENERATOR_WORKERS=8
@@ -48,12 +48,12 @@ YOLO_CH_DIM_EPOCHS=3
 U_NET_CH_DIM_EPOCHS=2
 
 YOLO_CKPT = '../yolo_weights'
-YOLO_PRETRAINED = '../yolov2-voc.weights'
+YOLO_PRETRAINED = None # '../yolov2-voc.weights'
 
 U_NET_CKPT = '../unet_weights'
 
 YOLO_OPT_ARGS = {
-    'lr'              : 1e-5,
+    'lr'              : 1e-4,
     'clipvalue'       : 0.1 ,
     'clipnorm'        : 1.0 ,
 }

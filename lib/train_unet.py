@@ -30,9 +30,11 @@ if not os.path.exists(conf.U_NET_CKPT):
 
 print('Begin to train U-Net model')
 
+scale_index = 0
 for EPOCH in range(0, conf.U_NET_EPOCHS, conf.U_NET_CH_DIM_EPOCHS):
     U_NET_GENERATOR_CONF = conf.unet_generator_config
-    img_size = np.random.choice(SCALES)
+    img_size = SCALES[scale_index]
+    scale_index = (scale_index+1) % conf.U_NET_CH_DIM_EPOCHS
     U_NET_GENERATOR_CONF['IMAGE_H'] = U_NET_GENERATOR_CONF['IMAGE_W'] = img_size
 
     unet_model, base_model = models.get_U_Net_model(img_size=img_size, gpus=conf.U_NET_USE_MULTI_GPU, load_weights=LAST_CKPT_PATH, verbose=True)
