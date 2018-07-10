@@ -78,6 +78,9 @@ class YOLO_BatchGenerator(Sequence):
             # augment input image and fix object's position and size
             img, all_objs = self.aug_image(train_instance, jitter=self.jitter)
 
+            if self.jitter:
+                np.random.shuffle(all_objs)
+
             # construct output from object's x, y, w, h
             true_box_index = 0
 

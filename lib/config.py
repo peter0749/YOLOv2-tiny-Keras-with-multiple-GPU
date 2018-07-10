@@ -41,8 +41,8 @@ U_NET_BATCH_SIZE=8
 
 GENERATOR_WORKERS=10
 
-YOLO_EPOCHS=120
-U_NET_EPOCHS=120
+YOLO_EPOCHS=180
+U_NET_EPOCHS=180
 
 YOLO_CH_DIM_EPOCHS=2
 U_NET_CH_DIM_EPOCHS=2
@@ -53,7 +53,7 @@ YOLO_PRETRAINED = None # '../yolov2-voc.weights'
 U_NET_CKPT = '../unet_weights'
 
 YOLO_OPT_ARGS = {
-    'lr'              : 1e-4,
+    'lr'              : 5e-4,
     'clipvalue'       : 0.1 ,
     'clipnorm'        : 1.0 ,
 }

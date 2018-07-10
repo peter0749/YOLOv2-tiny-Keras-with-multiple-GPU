@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 from utils import normalize, multi_gpu_ckpt
 from generators import U_NET_BatchGenerator
 
-SCALES = [conf.U_NET_DIM+32, conf.U_NET_DIM-32, conf.U_NET_DIM] # different scales
+SCALES = [conf.U_NET_DIM+32, conf.U_NET_DIM-32, conf.U_NET_DIM, conf.U_NET_DIM] # different scales
 LAST_CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
 
@@ -32,8 +32,11 @@ print('Begin to train U-Net model')
 scale_index = 0
 for EPOCH in range(0, conf.U_NET_EPOCHS, conf.U_NET_CH_DIM_EPOCHS):
     U_NET_GENERATOR_CONF = conf.unet_generator_config
-    img_size = SCALES[scale_index]
-    scale_index = (scale_index+1) % len(SCALES)
+    if scale_index==0:
+        np.random.shuffle(SCALES)
+        train_scales = SCALES + [conf.U_NET_DIM]*2
+    img_size = train_scales[scale_index]
+    scale_index = (scale_index+1) % len(train_scales)
     U_NET_GENERATOR_CONF['IMAGE_H'] = U_NET_GENERATOR_CONF['IMAGE_W'] = img_size
 
     unet_model, base_model = models.get_U_Net_model(img_size=img_size, gpus=conf.U_NET_USE_MULTI_GPU, load_weights=LAST_CKPT_PATH, verbose=True)
