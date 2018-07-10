@@ -145,8 +145,11 @@ class YOLO_BatchGenerator(Sequence):
 
         if jitter:
             ### scale the image
-            scale = np.random.uniform() / 10. + 1.
-            image = cv2.resize(image, (0,0), fx = scale, fy = scale, interpolation=cv2.INTER_LINEAR)
+            scale = 1.0
+
+            if np.random.binomial(1, .5):
+                scale = np.random.uniform() / 10. + 1.
+                image = cv2.resize(image, (0,0), fx = scale, fy = scale, interpolation=cv2.INTER_LINEAR)
 
             ### translate the image
             max_offx = (scale-1.) * w

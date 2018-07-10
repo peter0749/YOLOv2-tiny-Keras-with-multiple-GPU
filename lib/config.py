@@ -19,11 +19,11 @@ U_NET_DIM = 96
 
 # YOLO step-by-step ref:
 # https://github.com/experiencor/basic-yolo-keras/blob/master/Yolo%20Step-by-Step.ipynb
-YOLO_DIM = 224 ## must be integer (odd number) * 32.
+YOLO_DIM = 288 ## must be integer (odd number) * 32.
 OBJECT_THRESHOLD = 0.3 # <- notice here
 NMS_THRESHOLD = 0.3 # less overlapping
 U_NET_THRESHOLD = 0.5
-ANCHORS = [0.25,0.39, 0.78,1.03, 1.15,2.72, 2.59,4.35, 2.86,1.59, 5.62,5.08]
+ANCHORS = [0.28,0.44, 0.77,1.09, 1.07,2.89, 2.19,4.59, 2.28,1.52, 3.99,6.41, 5.24,2.87, 7.70,7.01]
 NO_OBJECT_SCALE  = 1.0
 OBJECT_SCALE     = 5.0
 COORD_SCALE      = 1.0
@@ -36,7 +36,7 @@ YOLO_SHOW_CONF = True
 YOLO_USE_MULTI_GPU=0
 U_NET_USE_MULTI_GPU=0
 
-YOLO_BATCH_SIZE=8  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
+YOLO_BATCH_SIZE=4  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
 U_NET_BATCH_SIZE=8
 
 GENERATOR_WORKERS=10
