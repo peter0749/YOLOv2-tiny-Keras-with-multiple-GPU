@@ -1,8 +1,11 @@
 import os
 import gc
+import config as conf
 import tensorflow as tf
 tfconfig = tf.ConfigProto()
 tfconfig.gpu_options.allow_growth = True
+if conf.USE_XLA:
+    tfconfig.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 from keras.backend.tensorflow_backend import set_session
 set_session(tf.Session(config=tfconfig))
 import numpy as np
@@ -11,7 +14,6 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, CSVLogg
 import keras.backend as K
 import models
 import reader
-import config as conf
 from sklearn.model_selection import train_test_split
 from utils import normalize, multi_gpu_ckpt
 from generators import YOLO_BatchGenerator

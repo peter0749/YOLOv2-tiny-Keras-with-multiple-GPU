@@ -70,6 +70,8 @@ U_NET_EARLY_STOP = 50
 YOLO_OUT_DIR = '../detection_output'
 U_NET_OUT_DIR = '../unet_out'
 
+USE_XLA = True
+
 ### !!! DO NOT EDIT THE CONFIGURATION BELOW !!! ###
 
 BOX = int(len(ANCHORS) // 2) # number of anchorboxes, default:5
