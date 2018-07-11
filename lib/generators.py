@@ -145,15 +145,16 @@ class YOLO_BatchGenerator(Sequence):
 
         if jitter:
             ### scale the image
-            scale = 1.0
+            scale_x, scale_y = 1.0, 1.0
 
             if np.random.binomial(1, .5):
-                scale = np.random.uniform() / 10. + 1.
-                image = cv2.resize(image, (0,0), fx = scale, fy = scale, interpolation=cv2.INTER_LINEAR)
+                scale_x += np.random.uniform() / 10.
+                scale_y += np.random.uniform() / 10.
+                image = cv2.resize(image, (0,0), fx = scale_x, fy = scale_y, interpolation=cv2.INTER_LINEAR)
 
             ### translate the image
-            max_offx = (scale-1.) * w
-            max_offy = (scale-1.) * h
+            max_offx = (scale_x-1.) * w
+            max_offy = (scale_y-1.) * h
             offx = int(np.random.uniform() * max_offx)
             offy = int(np.random.uniform() * max_offy)
 
@@ -172,13 +173,13 @@ class YOLO_BatchGenerator(Sequence):
         # fix object's position and size
         for obj in all_objs:
             for attr in ['xmin', 'xmax']:
-                if jitter: obj[attr] = int(obj[attr] * scale - offx)
+                if jitter: obj[attr] = int(obj[attr] * scale_x - offx)
 
                 obj[attr] = int(obj[attr] * float(self.config['IMAGE_W']) / w)
                 obj[attr] = max(min(obj[attr], self.config['IMAGE_W']), 0)
 
             for attr in ['ymin', 'ymax']:
-                if jitter: obj[attr] = int(obj[attr] * scale - offy)
+                if jitter: obj[attr] = int(obj[attr] * scale_y - offy)
 
                 obj[attr] = int(obj[attr] * float(self.config['IMAGE_H']) / h)
                 obj[attr] = max(min(obj[attr], self.config['IMAGE_H']), 0)
