@@ -53,7 +53,7 @@ YOLO_PRETRAINED = None # '../yolov2-voc.weights'
 U_NET_CKPT = '../unet_weights'
 
 YOLO_OPT_ARGS = {
-    'lr'              : 5e-4,
+    'lr'              : 2e-4,
     'clipvalue'       : 0.1 ,
     'clipnorm'        : 1.0 ,
 }

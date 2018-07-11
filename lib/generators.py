@@ -148,8 +148,8 @@ class YOLO_BatchGenerator(Sequence):
             scale_x, scale_y = 1.0, 1.0
 
             if np.random.binomial(1, .5):
-                scale_x += np.random.uniform() / 10.
-                scale_y += np.random.uniform() / 10.
+                scale_x += np.random.uniform(-0.1, 0.1)
+                scale_y += np.random.uniform(-0.1, 0.1)
                 image = cv2.resize(image, (0,0), fx = scale_x, fy = scale_y, interpolation=cv2.INTER_LINEAR)
 
             ### translate the image
