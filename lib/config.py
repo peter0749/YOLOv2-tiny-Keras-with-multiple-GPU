@@ -54,8 +54,8 @@ U_NET_CKPT = '../unet_weights'
 
 YOLO_OPT_ARGS = {
     'lr'              : 2e-4,
-    'clipvalue'       : 0.1 ,
-    'clipnorm'        : 1.0 ,
+    #'clipvalue'       : 0.1 ,
+    #'clipnorm'        : 1.0 ,
 }
 U_NET_OPT_ARGS = {
     'lr'              : 1e-3,
