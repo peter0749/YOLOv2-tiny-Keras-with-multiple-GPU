@@ -94,7 +94,7 @@ def draw_boxes(image_, boxes, labels, colors=None): ## channel order: RGB / BGR
                         (xmin, ymin - 10),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1e-3 * image.shape[0],
-                        color, 1)
+                        color, 2)
     return image
 
 ### modified version for binary classification
