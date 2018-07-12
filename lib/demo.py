@@ -1,20 +1,23 @@
 import os
 import sys
+import config as conf
 import tensorflow as tf
 tfconfig = tf.ConfigProto()
 tfconfig.gpu_options.allow_growth = True
+if conf.USE_XLA:
+    tfconfig.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 from keras.backend.tensorflow_backend import set_session
 set_session(tf.Session(config=tfconfig))
 import numpy as np
 import models
 import reader
-import config as conf
 from utils import normalize
 from utils import decode_netout, draw_boxes
 import cv2
+import seaborn as sns
 
 video_name = str(sys.argv[1])
-frame_skip = 1
+frame_skip = 3
 
 LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
@@ -32,22 +35,24 @@ print('YOLO model loaded!')
 
 videoCapture = cv2.VideoCapture(video_name)
 fps = videoCapture.get(cv2.CAP_PROP_FPS)
-size = (conf.YOLO_DIM, conf.YOLO_DIM)
-videoWriter = cv2.VideoWriter('detect_output.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), float(fps/frame_skip), size)
+size = (int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+        int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+videoWriter = cv2.VideoWriter('detect_output.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, size)
 
 labels = [ l['name'] for l in coco_valid.loadCats(conf.CLASS_IDS) ]
+colors = np.clip(np.round(np.asarray(sns.color_palette("Set2", len(labels)))*255), 0, 255).astype(np.uint8)
 dummy = np.empty((1, 1, 1, 1, conf.TRUE_BOX_BUFFER, 4))
 
 success, frame = videoCapture.read()
 frame_n = 0
 while success:
     if frame_n % frame_skip == 0:
-        resized_frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
+        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
         pred_netout = yolo_model.predict_on_batch([preprocessed_img, dummy])[0]
         boxes = decode_netout(pred_netout, conf.CLASSES, conf.OBJECT_THRESHOLD, conf.NMS_THRESHOLD, conf.ANCHORS)
         print('Detected objects: %d'%len(boxes))
-        img  = draw_boxes(resized_frame, boxes, labels)
+        img  = draw_boxes(frame, boxes, labels, colors=colors)
         cv2.imshow("detector", img)
         videoWriter.write(img)
     if cv2.waitKey(1)>=0:

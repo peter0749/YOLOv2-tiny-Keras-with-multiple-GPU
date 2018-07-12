@@ -77,7 +77,7 @@ def bbox_iou(box1, box2):
 
     return float(intersect) / union
 
-def draw_boxes(image_, boxes, labels): ## channel order: RGB / BGR
+def draw_boxes(image_, boxes, labels, colors=None): ## channel order: RGB / BGR
     image = copy.deepcopy(image_)
     for box in boxes:
         xmin  = int((box.x - box.w/2) * image.shape[1])
@@ -85,14 +85,16 @@ def draw_boxes(image_, boxes, labels): ## channel order: RGB / BGR
         ymin  = int((box.y - box.h/2) * image.shape[0])
         ymax  = int((box.y + box.h/2) * image.shape[0])
 
-        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), (0,255,0), conf.YOLO_DRAW_LINE_W)
+        color = tuple(map(int,colors[box.get_label()])) if colors is not None else (0,255,0)
+
+        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), color, conf.YOLO_DRAW_LINE_W)
         if conf.YOLO_SHOW_CONF:
             cv2.putText(image,
                         str(labels[box.get_label()]) + ' ' + str(box.get_score()),
                         (xmin, ymin - 10),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         1e-3 * image.shape[0],
-                        (0,255,0), 1)
+                        color, 1)
     return image
 
 ### modified version for binary classification
