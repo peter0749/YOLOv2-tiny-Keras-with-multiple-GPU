@@ -1,6 +1,3 @@
-import os
-import copy
-import tensorflow as tf
 import copy
 import cv2
 import numpy as np
@@ -97,7 +94,29 @@ def draw_boxes(image_, boxes, labels, colors=None): ## channel order: RGB / BGR
                         color, 2)
     return image
 
-### modified version for binary classification
+def draw_bbox_and_masks(image_, true_boxes, masks, labels, colors=None, alpha=0.7): ## channel order: RGB / BGR
+    image = copy.deepcopy(image_)
+    for box, mask in zip(true_boxes, masks):
+        xmin, xmax, ymin, ymax, label, score = box
+
+        color = colors[label] if colors is not None else np.array([0,255,0])
+        binary_mask = (cv2.resize(mask.astype(np.float32), (xmax-xmin, ymax-ymin), interpolation=cv2.INTER_AREA) > conf.U_NET_THRESHOLD).astype(np.bool)
+        if binary_mask.shape[0]>0 and binary_mask.shape[1]>0 and np.sum(binary_mask)>0:
+            crop = image[ymin:ymax,xmin:xmax].astype(np.float16)
+            crop[binary_mask] = crop[binary_mask]*(1.-alpha) + color.astype(np.float16)*alpha
+            image[ymin:ymax,xmin:xmax] = np.clip(np.round(crop), 0, 255).astype(np.uint8) # draw mask
+
+        color = tuple(map(int, color))
+        cv2.rectangle(image, (xmin,ymin), (xmax,ymax), color, conf.YOLO_DRAW_LINE_W)
+        if conf.YOLO_SHOW_CONF:
+            cv2.putText(image,
+                        str(labels[label]) + ' %.4f'%score,
+                        (xmin, ymin - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1e-3 * image.shape[0],
+                        color, 2)
+    return image
+
 ### ref. from https://github.com/experiencor/basic-yolo-keras/blob/master/utils.py
 def decode_netout(netout, nb_class, obj_threshold, nms_threshold, anchors):
     grid_h, grid_w, nb_box = netout.shape[:3]
