@@ -168,7 +168,7 @@ class YOLO_BatchGenerator(Sequence):
                 image = self.aug_pipe.augment_image(image)
 
         # resize the image to standard size
-        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_AREA)
+        image = cv2.resize(image, (self.config['IMAGE_W'], self.config['IMAGE_H']), interpolation=cv2.INTER_AREA)
 
         # fix object's position and size
         for obj in all_objs:
@@ -294,8 +294,10 @@ class U_NET_BatchGenerator(Sequence):
             mask  = seq_det.augment_image( mask)
 
         # resize the image to standard size
-        image = cv2.resize(image, (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_AREA) # shape: (IMAGE_H, IMAGE_W, 3)
-        mask  = (cv2.resize(np.squeeze(mask) , (self.config['IMAGE_H'], self.config['IMAGE_W']), interpolation=cv2.INTER_LINEAR)>.5).astype(np.float32) # shape: (IMAGE_H, IMAGE_W)
+        if image.shape[0]<=0 or image.shape[1]<=0 or mask.shape[0]<=0 or mask.shape[1]<=0:
+            return np.zeros((self.config['IMAGE_H'], self.config['IMAGE_W'], 3), dtype=np.float32), np.zeros((self.config['IMAGE_H'], self.config['IMAGE_W'], 1), dtype=np.float32)
+        image = cv2.resize(image, (self.config['IMAGE_W'], self.config['IMAGE_H']), interpolation=cv2.INTER_AREA) # shape: (IMAGE_H, IMAGE_W, 3)
+        mask  = (cv2.resize(np.squeeze(mask) , (self.config['IMAGE_W'], self.config['IMAGE_H']), interpolation=cv2.INTER_LINEAR)>.5).astype(np.float32) # shape: (IMAGE_H, IMAGE_W)
 
         return image, mask
 ### end U-Net generator ###
