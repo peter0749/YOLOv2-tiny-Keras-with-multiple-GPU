@@ -11,7 +11,7 @@ from keras.backend.tensorflow_backend import set_session
 set_session(tf.Session(config=tfconfig))
 import numpy as np
 import models
-import reader
+from pycocotools.coco import COCO
 from utils import normalize
 from utils import decode_netout, draw_boxes
 import cv2
@@ -24,7 +24,7 @@ LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
 CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5')
 
 print('Generating metadata...')
-coco_valid = reader.dataset_filepath(conf.VALID_IMG, conf.VALID_ANNO)[1]
+coco_valid = COCO(conf.VALID_ANNO)
 
 if not os.path.exists(conf.YOLO_CKPT):
     os.makedirs(conf.YOLO_CKPT)
