@@ -22,8 +22,8 @@ U_NET_DIM = 96
 # YOLO step-by-step ref:
 # https://github.com/experiencor/basic-yolo-keras/blob/master/Yolo%20Step-by-Step.ipynb
 YOLO_DIM = 288 ## must be integer (odd number) * 32.
-OBJECT_THRESHOLD = 0.3 # <- notice here
-NMS_THRESHOLD = 0.3 # less overlapping
+OBJECT_THRESHOLD = 0.3
+NMS_THRESHOLD = 0.5 
 U_NET_THRESHOLD = 0.5
 ANCHORS = [0.28,0.44, 0.77,1.09, 1.07,2.89, 2.19,4.59, 2.28,1.52, 3.99,6.41, 5.24,2.87, 7.70,7.01]
 NO_OBJECT_SCALE  = 1.0
