@@ -10,6 +10,7 @@ from keras.backend.tensorflow_backend import set_session
 set_session(tf.Session(config=tfconfig))
 import numpy as np
 from pycocotools.coco import COCO
+from pycocotools import mask as maskUtils
 import models
 from utils import normalize
 from utils import decode_netout
@@ -32,14 +33,15 @@ print('YOLO model loaded!')
 dummy = np.empty((1, 1, 1, 1, conf.TRUE_BOX_BUFFER, 4))
 final_results = []
 
-imgIds = coco_test.loadImgs()
+imgIds = coco_test.getImgIds()
 annotation_cnt = 0
-for image in tqdm(imgIds, total=len(imgIds)): # all images
+for imageId in tqdm(imgIds, total=len(imgIds)): # all images
+    image = coco_test.loadImgs(imageId)[0]
     image_path = os.path.join(conf.TEST_IMG, image['file_name'])
     width, height = image['width'], image['height']
     img_norm = normalize(cv2.imread(image_path))
     img_rs   = cv2.resize(img_norm, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
-    yolo_out = yolo_model.predict_on_batch_([img_rs[np.newaxis,...], dummy])[0]
+    yolo_out = yolo_model.predict_on_batch([img_rs[np.newaxis,...], dummy])[0]
     boxes    = decode_netout(yolo_out, conf.CLASSES, conf.OBJECT_THRESHOLD, conf.NMS_THRESHOLD, conf.ANCHORS)
     unet_inputs = []
     true_boxes = []
@@ -59,10 +61,10 @@ for image in tqdm(imgIds, total=len(imgIds)): # all images
     pred_masks = unet_model.predict(unet_inputs, batch_size=conf.U_NET_BATCH_SIZE) if len(unet_inputs)>0 else np.array([])
     for box, mask in zip(true_boxes, pred_masks):
         x, y, w, h, label, score = box
-        binary_mask_crop = (cv2.resize(mask[...,0], (w,h), interpolation=cv2.INTER_LINEAR)>conf.U_NET_THRESHOLD).astype(np.bool)
-        full_mask = np.zeros((height, width), dtype=np.bool)
+        binary_mask_crop = (cv2.resize(mask[...,0], (w,h), interpolation=cv2.INTER_LINEAR)>conf.U_NET_THRESHOLD).astype(np.uint8)
+        full_mask = np.zeros((height, width), dtype=np.uint8)
         full_mask[y:y+h, x:x+w] = binary_mask_crop
-        rle = coco_test.encode(full_mask)
+        rle = maskUtils.encode(np.asfortranarray(full_mask))
         annotation = {
                 'id': annotation_cnt,
                 'image_id': image['id'],
@@ -70,7 +72,8 @@ for image in tqdm(imgIds, total=len(imgIds)): # all images
                 'segmentation': rle,
                 'area': int(np.sum(binary_mask_crop)),
                 'bbox': [x, y, w, h],
-                'iscrowd': 1
+                'iscrowd': 1,
+                'score': float(score)
         }
         final_results.append(annotation)
         annotation_cnt += 1
