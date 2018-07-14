@@ -2,7 +2,7 @@
 
 Features:
 
-- [x] Implment YOLOv2-tiny without BatchNormalization (use WeightNormalization instead)
+- [x] Implment YOLOv2-tiny without Batch Normalization (use Weight Normalization instead)
 - [x] Multiscale training 
 - [x] Multiple GPU training
 - [x] U-Net for simple mask generation
