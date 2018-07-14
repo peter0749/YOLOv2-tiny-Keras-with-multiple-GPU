@@ -21,24 +21,24 @@ U_NET_DIM = 96
 
 # YOLO step-by-step ref:
 # https://github.com/experiencor/basic-yolo-keras/blob/master/Yolo%20Step-by-Step.ipynb
-YOLO_DIM = 288 ## must be integer (odd number) * 32.
+YOLO_DIM = 416 ## must be integer (odd number) * 32.
 OBJECT_THRESHOLD = 0.3
-NMS_THRESHOLD = 0.5 
+NMS_THRESHOLD = 0.35
 U_NET_THRESHOLD = 0.5
-ANCHORS = [0.28,0.44, 0.77,1.09, 1.07,2.89, 2.19,4.59, 2.28,1.52, 3.99,6.41, 5.24,2.87, 7.70,7.01]
+ANCHORS = [0.53,0.80, 1.71,2.36, 2.90,6.45, 6.34,3.79, 9.03,9.75]
 NO_OBJECT_SCALE  = 1.0
 OBJECT_SCALE     = 5.0
 COORD_SCALE      = 1.0
-WARM_UP_BATCHES  = 100
+WARM_UP_BATCHES  = 1000
 TRUE_BOX_BUFFER  = 50
 
 YOLO_DRAW_LINE_W = 2
 YOLO_SHOW_CONF = True
 
-YOLO_USE_MULTI_GPU=0
+YOLO_USE_MULTI_GPU=2
 U_NET_USE_MULTI_GPU=0
 
-YOLO_BATCH_SIZE=4  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
+YOLO_BATCH_SIZE=8  ## each gpus's batch size = YOLO_BATCH_SIZE / YOLO_USE_MULTI_GPU
 U_NET_BATCH_SIZE=8
 
 GENERATOR_WORKERS=10
@@ -46,7 +46,7 @@ GENERATOR_WORKERS=10
 YOLO_EPOCHS=180
 U_NET_EPOCHS=180
 
-YOLO_CH_DIM_EPOCHS=1
+YOLO_CH_DIM_EPOCHS=5
 U_NET_CH_DIM_EPOCHS=1
 
 YOLO_CKPT = '/hdd/dataset/MS-COCO/yolo_weights'

@@ -57,10 +57,10 @@ while success:
         print('Detected objects: %d'%len(boxes))
         img  = draw_boxes(frame, boxes, labels, colors=colors)
         cv2.putText(img, '%.2fms'%((t-s)*1.0e3), (img.shape[1]-img.shape[1]//7, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], (0, 255, 0), 2)
-        cv2.imshow("detector", img)
+        #cv2.imshow("detector", img)
         videoWriter.write(img)
-    if cv2.waitKey(1)>=0:
-        break
+    #if cv2.waitKey(1)>=0:
+    #    break
     success, frame = videoCapture.read()
     frame_n += 1
 
