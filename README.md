@@ -6,7 +6,7 @@ Features:
 - [x] Multiscale training 
 - [x] Multiple GPU training
 - [x] U-Net for simple mask generation
-- [x] Apply detection on video file
+- [x] Apply detection in video file
 
 ---
 Reference:
