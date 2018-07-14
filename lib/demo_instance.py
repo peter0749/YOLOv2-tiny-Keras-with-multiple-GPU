@@ -47,6 +47,10 @@ success, frame = videoCapture.read()
 frame_n = 0
 while success:
     if frame_n % frame_skip == 0:
+        YCrCb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
+        clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(7,7))
+        YCrCb[...,0] = clahe.apply(YCrCb[...,0])
+        frame = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
         s = time.time()
