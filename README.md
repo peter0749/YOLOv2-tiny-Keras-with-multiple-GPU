@@ -12,5 +12,6 @@ Features:
 Reference:
 
 [1] [YOLO9000: Better, Faster, Stronger](https://arxiv.org/abs/1612.08242)
+
 [2] [keras-yolo2](https://github.com/experiencor/keras-yolo2)
 
