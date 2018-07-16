@@ -18,7 +18,7 @@ import cv2
 import seaborn as sns
 
 video_name = str(sys.argv[1])
-frame_skip = 3
+frame_skip = 1
 
 YOLO_LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
 UNET_LAST_CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'last.hdf5')
@@ -47,13 +47,15 @@ success, frame = videoCapture.read()
 frame_n = 0
 while success:
     if frame_n % frame_skip == 0:
-        YCrCb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
-        clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(7,7))
-        YCrCb[...,0] = clahe.apply(YCrCb[...,0])
-        frame = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
-        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
-        preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
+    
         s = time.time()
+        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
+        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
+        YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
+        clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(8,8))
+        YCrCb[...,0] = clahe.apply(YCrCb[...,0])
+        resized_frame = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
+        preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
         pred_netout = yolo_model.predict_on_batch([preprocessed_img, dummy])[0]
         boxes = decode_netout(pred_netout, conf.CLASSES, conf.OBJECT_THRESHOLD, conf.NMS_THRESHOLD, conf.ANCHORS)
         print('Detected objects: %d'%len(boxes))
@@ -73,12 +75,16 @@ while success:
         unet_inputs = normalize(np.asarray(unet_inputs, dtype=np.float32))
         pred_masks = unet_model.predict(unet_inputs, batch_size=conf.U_NET_BATCH_SIZE) if len(unet_inputs)>0 else []
         t = time.time()
+        
         img  = draw_bbox_and_masks(frame, true_boxes, pred_masks, labels, colors=colors)
-        cv2.putText(img, '%.2fms'%((t-s)*1.0e3), (img.shape[1]-img.shape[1]//6, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], (0, 255, 0), 2)
-        #cv2.imshow("detector", img)
+        tick = t-s
+        c = (0, 255, 0) if tick*fps < 1 else (0, 0, 255)
+        
+        cv2.putText(img, '%.2fms'%(tick*1000), (img.shape[1]-img.shape[1]//6, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], c, 2)
+        cv2.imshow("detector", img)
         videoWriter.write(img)
-    #if cv2.waitKey(1)>=0:
-    #    break
+    if cv2.waitKey(1)>=0:
+        break
     success, frame = videoCapture.read()
     frame_n += 1
 
