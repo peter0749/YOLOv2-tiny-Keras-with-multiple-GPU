@@ -8,6 +8,10 @@ Features:
 - [x] U-Net for simple mask generation
 - [x] Apply detection in video file
 
+Demo:
+
+[![](https://img.youtube.com/vi/EL74bwGrowg/maxresdefault.jpg)](https://www.youtube.com/watch?v=EL74bwGrowg)
+
 ---
 Reference:
 
