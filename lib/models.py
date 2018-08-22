@@ -26,46 +26,107 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     input_image = Input(shape=(img_size, img_size, 3))
     true_boxes  = Input(shape=(1, 1, 1, conf.TRUE_BOX_BUFFER , 4))
 
-    # Tiny tiny tiny YOLOv2:
+    # YOLOv2:
     # Layer 1
-    x = Conv2D(16, (3,3), strides=(1,1), padding='same', name='conv_1', kernel_initializer='he_normal')(input_image)
+    x = Conv2D(32, (3,3), strides=(1,1), padding='same')(input_image)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x) # //2
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 2
-    x = Conv2D(32, (3,3), strides=(1,1), padding='same', name='conv_2', kernel_initializer='he_normal')(x)
+    x = Conv2D(64, (3,3), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x) # //4
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 3
-    x = Conv2D(64, (3,3), strides=(1,1), padding='same', name='conv_3', kernel_initializer='he_normal')(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x) # //8
 
     # Layer 4
-    x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_4', kernel_initializer='he_normal')(x)
+    x = Conv2D(64, (1,1), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x) # //16
 
     # Layer 5
-    x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_5', kernel_initializer='he_normal')(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x) # //32
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 6
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_6', kernel_initializer='he_normal')(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
-    x = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(x) # //32
 
     # Layer 7
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_7', kernel_initializer='he_normal')(x)
+    x = Conv2D(64, (1,1), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 8
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_8', kernel_initializer='he_normal')(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding='same')(x)
     x = LeakyReLU(alpha=0.1)(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 9
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 10
+    x = Conv2D(128, (1,1), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 11
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 12
+    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 13
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    skip_connection = x
+
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+
+    # Layer 14
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 15
+    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 16
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 17
+    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 18
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 19
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 20
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 21
+    skip_connection = Conv2D(64, (1,1), strides=(1,1), padding='same')(skip_connection)
+    skip_connection = LeakyReLU(alpha=0.1)(skip_connection)
+    skip_connection = Lambda(space_to_depth_x2)(skip_connection)
+
+    x = concatenate([skip_connection, x])
+
+    # Layer 22
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = LeakyReLU(alpha=0.1)(x)
+
+    # Layer 23
     x = Conv2D(conf.BOX * (4 + 1 + conf.CLASSES), (1,1), strides=(1,1), padding='same', name='conv_9', kernel_initializer='he_normal')(x)
     output = Reshape((img_size//32, img_size//32, conf.BOX, 4 + 1 + conf.CLASSES))(x)
 
