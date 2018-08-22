@@ -17,7 +17,7 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     from keras.layers.advanced_activations import LeakyReLU
     from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
     from keras.layers.merge import concatenate
-    from keras.utils.training_utils import multi_gpu_model
+    from keras.utils import multi_gpu_model
     import keras.backend as K
     from weightnorm import AdamWithWeightnorm as Adam
 
@@ -157,7 +157,7 @@ def get_U_Net_model(img_size=conf.U_NET_DIM, gpus=1, load_weights=None, verbose=
     from keras.layers.pooling import MaxPooling2D
     from keras.layers.merge import concatenate
     from keras.callbacks import EarlyStopping, ModelCheckpoint
-    from keras.utils.training_utils import multi_gpu_model
+    from keras.utils import multi_gpu_model
     from keras import backend as K
     from weightnorm import AdamWithWeightnorm as Adam
     import tensorflow as tf
