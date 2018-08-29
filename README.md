@@ -14,6 +14,8 @@ Demo:
 
 [![](image/segmentation.jpg)](https://www.youtube.com/watch?v=lLNvuVKsj90)
 
+[![](http://img.youtube.com/vi/AfjRyPO9-Vo/maxresdefault.jpg)](https://www.youtube.com/watch?v=AfjRyPO9-Vo)
+
 ---
 Reference:
 
