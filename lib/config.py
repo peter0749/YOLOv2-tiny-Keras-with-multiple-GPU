@@ -49,7 +49,7 @@ U_NET_EPOCHS=180
 YOLO_CH_DIM_EPOCHS=5
 U_NET_CH_DIM_EPOCHS=1
 
-YOLO_CKPT = '../weights'
+YOLO_CKPT = '../yolo_weights'
 YOLO_PRETRAINED = None # '../yolov2-voc.weights'
 
 U_NET_CKPT = '../unet_weights'
