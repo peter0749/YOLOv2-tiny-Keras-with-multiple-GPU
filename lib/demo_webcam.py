@@ -50,7 +50,6 @@ while success:
 
         s = time.time()
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
-        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
         clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(8,8))
         YCrCb[...,0] = clahe.apply(YCrCb[...,0])

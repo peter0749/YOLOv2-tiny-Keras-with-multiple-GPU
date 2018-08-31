@@ -47,9 +47,8 @@ success, frame = videoCapture.read()
 frame_n = 0
 while success:
     if frame_n % frame_skip == 0:
-    
+
         s = time.time()
-        resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
         clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(8,8))
@@ -75,11 +74,11 @@ while success:
         unet_inputs = normalize(np.asarray(unet_inputs, dtype=np.float32))
         pred_masks = unet_model.predict(unet_inputs, batch_size=conf.U_NET_BATCH_SIZE) if len(unet_inputs)>0 else []
         t = time.time()
-        
+
         img  = draw_bbox_and_masks(frame, true_boxes, pred_masks, labels, colors=colors)
         tick = t-s
         c = (0, 255, 0) if tick*fps < 1 else (0, 0, 255)
-        
+
         cv2.putText(img, '%.2fms'%(tick*1000), (img.shape[1]-img.shape[1]//6, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], c, 2)
         cv2.imshow("detector", img)
         videoWriter.write(img)

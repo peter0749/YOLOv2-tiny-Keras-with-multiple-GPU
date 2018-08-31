@@ -48,7 +48,7 @@ success, frame = videoCapture.read()
 frame_n = 0
 while success:
     if frame_n % frame_skip == 0:
-        
+
         s = time.time()
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
         YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
@@ -59,13 +59,13 @@ while success:
         pred_netout = yolo_model.predict_on_batch([preprocessed_img, dummy])[0]
         boxes = decode_netout(pred_netout, conf.CLASSES, conf.OBJECT_THRESHOLD, conf.NMS_THRESHOLD, conf.ANCHORS)
         t = time.time()
-        
+
         print('Detected objects: %d'%len(boxes))
         img  = draw_boxes(frame, boxes, labels, colors=colors)
-        
+
         tick = t-s
         c = (0,255,0) if tick*fps<1 else (0,0,255)
-        
+
         cv2.putText(img, '%.2fms'%(tick*1000), (img.shape[1]-img.shape[1]//6, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], c, 2)
         cv2.imshow("detector", img)
         videoWriter.write(img)
