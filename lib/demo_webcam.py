@@ -10,7 +10,6 @@ from keras.backend.tensorflow_backend import set_session
 set_session(tf.Session(config=tfconfig))
 import numpy as np
 import models
-from pycocotools.coco import COCO
 from utils import normalize
 from utils import decode_netout, draw_bbox_and_masks
 import cv2
@@ -19,16 +18,15 @@ import seaborn as sns
 video_name = 0
 frame_skip = 1
 
-YOLO_LAST_CKPT_PATH = os.path.join(conf.YOLO_CKPT, 'last.hdf5')
+YOLO_PRETRAINED = os.path.join(conf.YOLO_CKPT, 'yolov2.weights')
 UNET_LAST_CKPT_PATH = os.path.join(conf.U_NET_CKPT, 'last.hdf5')
 
 print('Generating metadata...')
-coco_valid = COCO(conf.VALID_ANNO)
 
 if not os.path.exists(conf.YOLO_CKPT):
     os.makedirs(conf.YOLO_CKPT)
 
-yolo_model = models.get_yolo_model(img_size=conf.YOLO_DIM, gpus=0, load_weights = YOLO_LAST_CKPT_PATH, verbose=True)[0]
+yolo_model = models.get_yolo_model(img_size=conf.YOLO_DIM, gpus=0, load_weights = YOLO_PRETRAINED, verbose=True)[0]
 unet_model = models.get_U_Net_model(img_size=conf.U_NET_DIM, gpus=0, load_weights = UNET_LAST_CKPT_PATH, verbose=True)[0]
 print('YOLO model loaded!')
 
@@ -36,7 +34,7 @@ videoCapture = cv2.VideoCapture(video_name)
 size = (int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
         int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-labels = [ l['name'] for l in coco_valid.loadCats(conf.CLASS_IDS) ]
+labels = conf.LABELS
 colors = np.clip(np.round(np.asarray(sns.color_palette("Set2", len(labels)))*255), 0, 255).astype(np.uint8)
 dummy = np.empty((1, 1, 1, 1, conf.TRUE_BOX_BUFFER, 4))
 obj_threshold = conf.OBJECT_THRESHOLD

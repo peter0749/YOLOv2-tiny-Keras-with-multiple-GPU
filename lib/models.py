@@ -13,74 +13,86 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     def space_to_depth_x2(x):
         return tf.space_to_depth(x, block_size=2)
     from keras.models import Sequential, Model
-    from keras.layers import Reshape, Activation, Conv2D, Input, MaxPooling2D, Flatten, Dense, Lambda
+    from keras.layers import Reshape, Activation, Conv2D, Input, MaxPooling2D, Flatten, Dense, Lambda, BatchNormalization
     from keras.layers.advanced_activations import LeakyReLU
     from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
     from keras.layers.merge import concatenate
     from keras.utils import multi_gpu_model
     import keras.backend as K
-    from weightnorm import AdamWithWeightnorm as Adam
-
-    YOLO_GRID = conf.YOLO_GRID
+    from keras.optimizers import Adam
 
     input_image = Input(shape=(img_size, img_size, 3))
     true_boxes  = Input(shape=(1, 1, 1, conf.TRUE_BOX_BUFFER , 4))
 
     # YOLOv2:
+
     # Layer 1
-    x = Conv2D(32, (3,3), strides=(1,1), padding='same')(input_image)
+    x = Conv2D(32, (3,3), strides=(1,1), padding='same', name='conv_1', use_bias=False)(input_image)
+    x = BatchNormalization(name='norm_1')(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 2
-    x = Conv2D(64, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(64, (3,3), strides=(1,1), padding='same', name='conv_2', use_bias=False)(x)
+    x = BatchNormalization(name='norm_2')(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 3
-    x = Conv2D(128, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_3', use_bias=False)(x)
+    x = BatchNormalization(name='norm_3')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 4
-    x = Conv2D(64, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(64, (1,1), strides=(1,1), padding='same', name='conv_4', use_bias=False)(x)
+    x = BatchNormalization(name='norm_4')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 5
-    x = Conv2D(128, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(128, (3,3), strides=(1,1), padding='same', name='conv_5', use_bias=False)(x)
+    x = BatchNormalization(name='norm_5')(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 6
-    x = Conv2D(256, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_6', use_bias=False)(x)
+    x = BatchNormalization(name='norm_6')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 7
-    x = Conv2D(64, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(128, (1,1), strides=(1,1), padding='same', name='conv_7', use_bias=False)(x)
+    x = BatchNormalization(name='norm_7')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 8
-    x = Conv2D(256, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(256, (3,3), strides=(1,1), padding='same', name='conv_8', use_bias=False)(x)
+    x = BatchNormalization(name='norm_8')(x)
     x = LeakyReLU(alpha=0.1)(x)
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 9
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_9', use_bias=False)(x)
+    x = BatchNormalization(name='norm_9')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 10
-    x = Conv2D(128, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(256, (1,1), strides=(1,1), padding='same', name='conv_10', use_bias=False)(x)
+    x = BatchNormalization(name='norm_10')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 11
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_11', use_bias=False)(x)
+    x = BatchNormalization(name='norm_11')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 12
-    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(256, (1,1), strides=(1,1), padding='same', name='conv_12', use_bias=False)(x)
+    x = BatchNormalization(name='norm_12')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 13
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(512, (3,3), strides=(1,1), padding='same', name='conv_13', use_bias=False)(x)
+    x = BatchNormalization(name='norm_13')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     skip_connection = x
@@ -88,46 +100,55 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
     x = MaxPooling2D(pool_size=(2, 2))(x)
 
     # Layer 14
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_14', use_bias=False)(x)
+    x = BatchNormalization(name='norm_14')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 15
-    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(512, (1,1), strides=(1,1), padding='same', name='conv_15', use_bias=False)(x)
+    x = BatchNormalization(name='norm_15')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 16
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_16', use_bias=False)(x)
+    x = BatchNormalization(name='norm_16')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 17
-    x = Conv2D(256, (1,1), strides=(1,1), padding='same')(x)
+    x = Conv2D(512, (1,1), strides=(1,1), padding='same', name='conv_17', use_bias=False)(x)
+    x = BatchNormalization(name='norm_17')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 18
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_18', use_bias=False)(x)
+    x = BatchNormalization(name='norm_18')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 19
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_19', use_bias=False)(x)
+    x = BatchNormalization(name='norm_19')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 20
-    x = Conv2D(512, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_20', use_bias=False)(x)
+    x = BatchNormalization(name='norm_20')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 21
-    skip_connection = Conv2D(64, (1,1), strides=(1,1), padding='same')(skip_connection)
+    skip_connection = Conv2D(64, (1,1), strides=(1,1), padding='same', name='conv_21', use_bias=False)(skip_connection)
+    skip_connection = BatchNormalization(name='norm_21')(skip_connection)
     skip_connection = LeakyReLU(alpha=0.1)(skip_connection)
     skip_connection = Lambda(space_to_depth_x2)(skip_connection)
 
     x = concatenate([skip_connection, x])
 
     # Layer 22
-    x = Conv2D(1024, (3,3), strides=(1,1), padding='same')(x)
+    x = Conv2D(1024, (3,3), strides=(1,1), padding='same', name='conv_22', use_bias=False)(x)
+    x = BatchNormalization(name='norm_22')(x)
     x = LeakyReLU(alpha=0.1)(x)
 
     # Layer 23
-    x = Conv2D(conf.BOX * (4 + 1 + conf.CLASSES), (1,1), strides=(1,1), padding='same', name='conv_9', kernel_initializer='he_normal')(x)
+    x = Conv2D(conf.BOX * (4 + 1 + conf.CLASSES), (1,1), strides=(1,1), padding='same', name='conv_23', kernel_initializer='he_normal')(x)
     output = Reshape((img_size//32, img_size//32, conf.BOX, 4 + 1 + conf.CLASSES))(x)
 
     # small hack to allow true_boxes to be registered when Keras build the model
@@ -138,7 +159,30 @@ def get_yolo_model(img_size=conf.YOLO_DIM, gpus=1, load_weights=None, verbose=Fa
         cpu_model = Model([input_image, true_boxes], output)
         cpu_model.compile(loss=losses.yolo_loss(true_boxes, img_size), optimizer=optimizer)
         if load_weights is not None and os.path.exists(load_weights):
-            cpu_model.load_weights(load_weights)
+            weight_reader = WeightReader(load_weights)
+            weight_reader.reset()
+            nb_conv = 23
+            for i in range(1, nb_conv+1):
+                conv_layer = cpu_model.get_layer('conv_' + str(i))
+                if i < nb_conv:
+                    norm_layer = cpu_model.get_layer('norm_' + str(i))
+                    size = np.prod(norm_layer.get_weights()[0].shape)
+                    beta  = weight_reader.read_bytes(size)
+                    gamma = weight_reader.read_bytes(size)
+                    mean  = weight_reader.read_bytes(size)
+                    var   = weight_reader.read_bytes(size)
+                    norm_layer.set_weights([gamma, beta, mean, var])
+                if len(conv_layer.get_weights()) > 1:
+                    bias   = weight_reader.read_bytes(np.prod(conv_layer.get_weights()[1].shape))
+                    kernel = weight_reader.read_bytes(np.prod(conv_layer.get_weights()[0].shape))
+                    kernel = kernel.reshape(list(reversed(conv_layer.get_weights()[0].shape)))
+                    kernel = kernel.transpose([2,3,1,0])
+                    conv_layer.set_weights([kernel, bias])
+                else:
+                    kernel = weight_reader.read_bytes(np.prod(conv_layer.get_weights()[0].shape))
+                    kernel = kernel.reshape(list(reversed(conv_layer.get_weights()[0].shape)))
+                    kernel = kernel.transpose([2,3,1,0])
+                    conv_layer.set_weights([kernel])
             if verbose:
                 print('Loaded weights')
     if gpus>=2:
@@ -159,7 +203,7 @@ def get_U_Net_model(img_size=conf.U_NET_DIM, gpus=1, load_weights=None, verbose=
     from keras.callbacks import EarlyStopping, ModelCheckpoint
     from keras.utils import multi_gpu_model
     from keras import backend as K
-    from weightnorm import AdamWithWeightnorm as Adam
+    from keras.optimizers import Adam
     import tensorflow as tf
 
     IMG_WIDTH = img_size

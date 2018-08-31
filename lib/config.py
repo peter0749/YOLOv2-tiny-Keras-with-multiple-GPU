@@ -1,20 +1,9 @@
 import numpy as np
 # ROOT TO DATASET (DATA & TEST)
-TRAIN_ANNO = '../annotations/instances_train2017.json'
-TRAIN_IMG = ''
-VALID_ANNO = '../annotations/instances_val2017.json'
-VALID_IMG = ''
-TEST_IMG = ''
-TEST_ANNO = ''
 CLASSES = 80 # MS COCO dataset
-CLASS_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67, 70, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 84, 85, 86, 87, 88, 89, 90]
-assert len(CLASS_IDS)==CLASSES
-ID_MAP = dict()
-for n, cat in enumerate(CLASS_IDS):
-    ID_MAP[cat] = n
 CLASS_WEIGHTS = np.ones(CLASSES, dtype='float32')
 CLASS_SCALE = 1.0
-SUBMISSION= ''
+LABELS = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
 
 # U-Net for semantic segmentation
 U_NET_DIM = 96
@@ -22,10 +11,10 @@ U_NET_DIM = 96
 # YOLO step-by-step ref:
 # https://github.com/experiencor/basic-yolo-keras/blob/master/Yolo%20Step-by-Step.ipynb
 YOLO_DIM = 416 ## must be integer (odd number) * 32.
-OBJECT_THRESHOLD = 0.4
-NMS_THRESHOLD = 0.35
+OBJECT_THRESHOLD = 0.6
+NMS_THRESHOLD = 0.45
 U_NET_THRESHOLD = 0.5
-ANCHORS = [0.53,0.80, 1.71,2.36, 2.90,6.45, 6.34,3.79, 9.03,9.75]
+ANCHORS = [0.57273, 0.677385, 1.87446, 2.06253, 3.33843, 5.47434, 7.88282, 3.52778, 9.77052, 9.16828]
 NO_OBJECT_SCALE  = 1.0
 OBJECT_SCALE     = 5.0
 COORD_SCALE      = 1.0
