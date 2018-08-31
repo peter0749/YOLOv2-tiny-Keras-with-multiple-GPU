@@ -61,7 +61,7 @@ U_NET_EARLY_STOP = 50
 YOLO_OUT_DIR = './detection_output'
 U_NET_OUT_DIR = './unet_out'
 
-USE_XLA = True
+USE_XLA = False
 
 ### !!! DO NOT EDIT THE CONFIGURATION BELOW !!! ###
 
