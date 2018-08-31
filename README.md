@@ -10,11 +10,7 @@ Features:
 
 Demo (Youtube):
 
-[![](image/detection.jpg)](https://www.youtube.com/watch?v=3d21OAAEs2Q)
-
-[![](image/segmentation.jpg)](https://www.youtube.com/watch?v=lLNvuVKsj90)
-
-[![](http://img.youtube.com/vi/AfjRyPO9-Vo/maxresdefault.jpg)](https://www.youtube.com/watch?v=AfjRyPO9-Vo)
+[![](image/segmentation.jpg)](https://www.youtube.com/watch?v=zgdMRz1srTs)
 
 ---
 Reference:
