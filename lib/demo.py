@@ -51,10 +51,6 @@ while success:
 
         s = time.time()
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
-        YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
-        clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(8,8))
-        YCrCb[...,0] = clahe.apply(YCrCb[...,0])
-        resized_frame = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
         preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
         pred_netout = yolo_model.predict_on_batch([preprocessed_img, dummy])[0]
         boxes = decode_netout(pred_netout, conf.CLASSES, conf.OBJECT_THRESHOLD, conf.NMS_THRESHOLD, conf.ANCHORS)

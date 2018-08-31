@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import config as conf
 import tensorflow as tf
@@ -34,7 +33,6 @@ unet_model = models.get_U_Net_model(img_size=conf.U_NET_DIM, gpus=0, load_weight
 print('YOLO model loaded!')
 
 videoCapture = cv2.VideoCapture(video_name)
-fps = videoCapture.get(cv2.CAP_PROP_FPS)
 size = (int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
         int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
@@ -42,6 +40,7 @@ labels = [ l['name'] for l in coco_valid.loadCats(conf.CLASS_IDS) ]
 colors = np.clip(np.round(np.asarray(sns.color_palette("Set2", len(labels)))*255), 0, 255).astype(np.uint8)
 dummy = np.empty((1, 1, 1, 1, conf.TRUE_BOX_BUFFER, 4))
 obj_threshold = conf.OBJECT_THRESHOLD
+c = (0, 255, 0)
 
 success, frame = videoCapture.read()
 frame_n = 0
@@ -50,10 +49,6 @@ while success:
 
         s = time.time()
         resized_frame = cv2.resize(frame, (conf.YOLO_DIM, conf.YOLO_DIM), interpolation=cv2.INTER_AREA)
-        YCrCb = cv2.cvtColor(resized_frame, cv2.COLOR_BGR2YCrCb)
-        clahe = cv2.createCLAHE(clipLimit=2,tileGridSize=(8,8))
-        YCrCb[...,0] = clahe.apply(YCrCb[...,0])
-        resized_frame = cv2.cvtColor(YCrCb, cv2.COLOR_YCrCb2BGR)
         preprocessed_img = normalize(resized_frame[...,::-1].astype(np.float32))[np.newaxis,...]
         pred_netout = yolo_model.predict_on_batch([preprocessed_img, dummy])[0]
         boxes = decode_netout(pred_netout, conf.CLASSES, obj_threshold, conf.NMS_THRESHOLD, conf.ANCHORS)
@@ -77,9 +72,9 @@ while success:
 
         img  = draw_bbox_and_masks(frame, true_boxes, pred_masks, labels, colors=colors)
         tick = t-s
-        c = (0, 255, 0) if tick*fps < 1 else (0, 0, 255)
 
         cv2.putText(img, '%.2fms'%(tick*1000), (img.shape[1]-img.shape[1]//6, img.shape[0]//12), cv2.FONT_HERSHEY_SIMPLEX, 2e-3 * img.shape[0], c, 2)
+        cv2.imshow("preprocess", resized_frame)
         cv2.imshow("detector", img)
         key = cv2.waitKey(1)
     if key==43: # 43: +; 45: -
